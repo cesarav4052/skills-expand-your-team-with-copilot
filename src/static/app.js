@@ -25,6 +25,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const closeLoginModal = document.querySelector(".close-login-modal");
   const loginMessage = document.getElementById("login-message");
 
+  // School name used in sharing
+  const SCHOOL_NAME = "Mergington High School";
+
   // Activity categories with corresponding colors
   const activityTypes = {
     sports: { label: "Sports", color: "#e8f5e9", textColor: "#2e7d32" },
@@ -568,6 +571,9 @@ document.addEventListener("DOMContentLoaded", () => {
           </div>
         `
         }
+        <button class="share-button" data-activity="${name}" aria-label="Share this activity">
+          🔗 Share
+        </button>
       </div>
     `;
 
@@ -586,6 +592,12 @@ document.addEventListener("DOMContentLoaded", () => {
         });
       }
     }
+
+    // Add click handler for share button
+    const shareButton = activityCard.querySelector(".share-button");
+    shareButton.addEventListener("click", () => {
+      shareActivity(name, details);
+    });
 
     activitiesList.appendChild(activityCard);
   }
@@ -797,6 +809,37 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }
     );
+  }
+
+  // Share an activity with the Web Share API or clipboard fallback
+  async function shareActivity(name, details) {
+    const formattedSchedule = formatSchedule(details);
+    const shareText = `Check out this activity at ${SCHOOL_NAME}!\n\n${name}\n${details.description}\nSchedule: ${formattedSchedule}`;
+    const shareUrl = window.location.href;
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `${name} – ${SCHOOL_NAME}`,
+          text: shareText,
+          url: shareUrl,
+        });
+      } catch (error) {
+        // User cancelled or share failed – silently ignore cancellations
+        if (error.name !== "AbortError") {
+          console.error("Share failed:", error);
+        }
+      }
+    } else {
+      // Fallback: copy activity details to clipboard
+      try {
+        await navigator.clipboard.writeText(`${shareText}\n${shareUrl}`);
+        showMessage("Activity details copied to clipboard!", "success");
+      } catch (error) {
+        console.error("Clipboard copy failed:", error);
+        showMessage("Could not share. Please copy the page URL manually.", "error");
+      }
+    }
   }
 
   // Show message function
