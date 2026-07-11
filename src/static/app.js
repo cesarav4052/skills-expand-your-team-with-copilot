@@ -25,6 +25,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const closeLoginModal = document.querySelector(".close-login-modal");
   const loginMessage = document.getElementById("login-message");
 
+  // School name used in sharing
+  const SCHOOL_NAME = "Mergington High School";
+
   // Activity categories with corresponding colors
   const activityTypes = {
     sports: { label: "Sports", color: "#e8f5e9", textColor: "#2e7d32" },
@@ -811,13 +814,13 @@ document.addEventListener("DOMContentLoaded", () => {
   // Share an activity with the Web Share API or clipboard fallback
   async function shareActivity(name, details) {
     const formattedSchedule = formatSchedule(details);
-    const shareText = `Check out this activity at Mergington High School!\n\n${name}\n${details.description}\nSchedule: ${formattedSchedule}`;
+    const shareText = `Check out this activity at ${SCHOOL_NAME}!\n\n${name}\n${details.description}\nSchedule: ${formattedSchedule}`;
     const shareUrl = window.location.href;
 
     if (navigator.share) {
       try {
         await navigator.share({
-          title: `${name} – Mergington High School`,
+          title: `${name} – ${SCHOOL_NAME}`,
           text: shareText,
           url: shareUrl,
         });
